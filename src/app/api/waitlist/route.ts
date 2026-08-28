@@ -1,13 +1,80 @@
 import { NextResponse } from "next/server"
 import nodemailer from "nodemailer"
 
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+type RateLimitStore = Map<string, number[]>
+
+declare global {
+    var __waitlistRateLimit: RateLimitStore | undefined
+}
+
+const rateLimitHits: RateLimitStore = globalThis.__waitlistRateLimit ?? new Map()
+globalThis.__waitlistRateLimit = rateLimitHits
+
+function getClientIp(req: Request): string {
+    const forwarded = req.headers.get("x-forwarded-for")
+    if (forwarded) {
+        const first = forwarded.split(",")[0]?.trim()
+        if (first) return first
+    }
+    return req.headers.get("cf-connecting-ip")?.trim()
+        || req.headers.get("x-real-ip")?.trim()
+        || "unknown"
+}
+
+function isRateLimited(ip: string): boolean {
+    const now = Date.now()
+    const recent = (rateLimitHits.get(ip) || []).filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS)
+    if (recent.length >= RATE_LIMIT_MAX) {
+        rateLimitHits.set(ip, recent)
+        return true
+    }
+    recent.push(now)
+    rateLimitHits.set(ip, recent)
+    return false
+}
+
+function escapeHtml(value: string): string {
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+}
+
+function isFilledHoneypot(value: unknown): boolean {
+    return typeof value === "string" && value.trim().length > 0
+}
+
 export async function POST(req: Request) {
     try {
-        const { email } = await req.json()
+        const ip = getClientIp(req)
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429, headers: { "Retry-After": "3600" } },
+            )
+        }
 
-        if (!email || !email.includes("@")) {
+        const body = await req.json().catch(() => null) as Record<string, unknown> | null
+        if (!body || typeof body !== "object") {
+            return NextResponse.json({ error: "Invalid request" }, { status: 400 })
+        }
+
+        if (isFilledHoneypot(body.website) || isFilledHoneypot(body.company)) {
+            return NextResponse.json({ success: true })
+        }
+
+        const email = typeof body.email === "string" ? body.email.trim() : ""
+        if (!email || !EMAIL_PATTERN.test(email)) {
             return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
         }
+
+        const safeEmail = escapeHtml(email)
 
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
@@ -56,7 +123,7 @@ export async function POST(req: Request) {
                         </div>
 
                         <p style="font-size: 14px; line-height: 1.6; color: #888; text-align: center; margin-bottom: 40px;">
-                            We'll reach out to <strong>${email}</strong> as soon as your slot is ready.
+                            We'll reach out to <strong>${safeEmail}</strong> as soon as your slot is ready.
                         </p>
 
                         <div style="text-align: center; margin-bottom: 40px;">

@@ -6,10 +6,11 @@ import { CheckCircle2, Loader2, ArrowRight } from "lucide-react"
 
 export function WaitlistForm() {
     const [email, setEmail] = useState("")
+    const [website, setWebsite] = useState("")
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
     const [message, setMessage] = useState("")
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!email) return
 
@@ -18,7 +19,7 @@ export function WaitlistForm() {
             const res = await fetch("/api/waitlist", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email, website }),
             })
 
             if (res.ok) {
@@ -61,6 +62,16 @@ export function WaitlistForm() {
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="flex-1 flex items-center w-full">
+                                <input
+                                    type="text"
+                                    name="website"
+                                    value={website}
+                                    onChange={(e) => setWebsite(e.target.value)}
+                                    tabIndex={-1}
+                                    autoComplete="off"
+                                    aria-hidden="true"
+                                    className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                                />
                                 <input
                                     type="email"
                                     required

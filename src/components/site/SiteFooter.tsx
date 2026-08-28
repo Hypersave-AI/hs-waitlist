@@ -8,6 +8,7 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
             { label: "Features", href: "/features" },
             { label: "How it works", href: "/how-it-works" },
             { label: "Developers", href: "/developers" },
+            { label: "Pricing", href: "/pricing" },
             { label: "Get API key", href: "https://platform.hypersave.io/signup", external: true },
         ],
     },

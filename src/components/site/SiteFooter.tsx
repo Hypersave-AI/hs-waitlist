@@ -26,12 +26,13 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
         links: [
             { label: "About", href: "/about" },
             { label: "Careers", href: "/about#careers" },
-            { label: "Contact", href: "mailto:hello@hypersave.io", external: true },
+            { label: "Contact", href: "/contact" },
         ],
     },
     {
         title: "Legal",
         links: [
+            { label: "Security", href: "/security" },
             { label: "Privacy", href: "https://docs.hypersave.io/legal/privacy", external: true },
             { label: "Terms", href: "https://docs.hypersave.io/legal/terms", external: true },
         ],
@@ -41,7 +42,7 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
 const SOCIALS = [
     { label: "X", href: "https://x.com/hypersave_io" },
     { label: "Instagram", href: "https://instagram.com/hypersaveai" },
-    { label: "GitHub", href: "https://github.com/hypersave" },
+    { label: "GitHub", href: "https://github.com/Hypersave-AI" },
 ]
 
 export function SiteFooter() {

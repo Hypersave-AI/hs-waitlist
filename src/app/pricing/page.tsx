@@ -13,30 +13,48 @@ const PLANS = [
         name: "Free",
         price: "$0",
         period: "/mo",
-        blurb: "Ship a first memory loop.",
+        blurb: "Everything you need to ship a first memory loop.",
         href: "https://platform.hypersave.io/signup",
         cta: "Get your API key",
         featured: false,
         items: [
-            "1M tokens / month",
+            "2M memory tokens / month",
+            "10,000 recalls / month",
             "3 API keys",
-            "Memory app — save, ask, inspect",
-            "MCP + SDK quickstart",
+            "Facts, knowledge graph, timelines",
+            "MCP server + SDKs",
         ],
     },
     {
         name: "Pro",
-        price: "$29",
+        price: "$15",
         period: "/mo",
         blurb: "Production apps that remember.",
-        href: "mailto:sales@hypersave.io?subject=Hypersave%20Pro%20access",
-        cta: "Request Pro",
+        href: "https://platform.hypersave.io/signup",
+        cta: "Start with Pro",
         featured: true,
         items: [
-            "5M tokens / month",
+            "10M memory tokens / month",
+            "250,000 recalls / month",
             "10 API keys",
+            "10× higher request limits",
             "Priority support",
-            "Knowledge graph + analytics",
+        ],
+    },
+    {
+        name: "Scale",
+        price: "$199",
+        period: "/mo",
+        blurb: "High-volume products and teams.",
+        href: "mailto:sales@hypersave.io?subject=Hypersave%20Scale",
+        cta: "Get Scale",
+        featured: false,
+        items: [
+            "200M memory tokens / month",
+            "5M recalls / month",
+            "100 API keys",
+            "30× higher request limits",
+            "Dedicated support channel",
         ],
     },
     {
@@ -48,11 +66,26 @@ const PLANS = [
         cta: "Talk to us",
         featured: false,
         items: [
-            "10M tokens / month included",
-            "100 API keys",
+            "Custom token and recall volumes",
+            "Custom data-processing terms (DPA)",
+            "SLA and security review",
             "Dedicated support",
-            "Compliance workflows + SLAs",
         ],
+    },
+]
+
+const FAQ = [
+    {
+        q: "What is a memory token?",
+        a: "Roughly four characters of text. You use tokens when you save content, and when Hypersave writes an answer for you (the memories it reads count). Plain searches do not use tokens.",
+    },
+    {
+        q: "What is a recall?",
+        a: "One search or question against your memory, whether you ask for a written answer or just the matching memories.",
+    },
+    {
+        q: "How do I upgrade?",
+        a: "Sign up free, then choose Upgrade in your dashboard. Billing is monthly through Stripe and you can cancel any time.",
     },
 ]
 
@@ -70,10 +103,10 @@ export default function PricingPage() {
                                 Pay when memory is working.
                             </>
                         }
-                        lead="Same API. Same Memory app. Upgrade when you outgrow the free tier — not before."
+                        lead="Generous free tier, honest limits, and every memory feature on every plan. Upgrade when you outgrow it — not before."
                     />
 
-                    <div className="mt-16 grid gap-px border border-zinc-200 bg-zinc-200 md:grid-cols-3">
+                    <div className="mt-16 grid gap-px border border-zinc-200 bg-zinc-200 md:grid-cols-2 lg:grid-cols-4">
                         {PLANS.map((plan) => (
                             <div
                                 key={plan.name}
@@ -113,6 +146,15 @@ export default function PricingPage() {
                                         {plan.cta}
                                     </Button>
                                 </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-20 grid gap-10 md:grid-cols-3">
+                        {FAQ.map((item) => (
+                            <div key={item.q}>
+                                <h3 className="text-base font-semibold text-zinc-950">{item.q}</h3>
+                                <p className="mt-2 text-sm leading-relaxed text-zinc-500">{item.a}</p>
                             </div>
                         ))}
                     </div>
